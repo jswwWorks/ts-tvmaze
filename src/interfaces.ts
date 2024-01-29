@@ -1,6 +1,4 @@
 
-
-// interface
 interface IShow {
   id: number;
   name: string;
