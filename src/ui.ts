@@ -7,12 +7,14 @@ const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 
 
-/** Given list of shows, create markup for each and to DOM */
+/** Given list of shows, create markup for each and add to DOM
+ * shows is array like [{id, name, summary, image}, ...]
+*/
 
 function populateShows(shows : Array<IShow>): void {
   $showsList.empty();
 
-  for (let show of shows) {
+  for (const show of shows) {
     const x = show.image;
 
     const $show = $(
@@ -41,7 +43,7 @@ function populateShows(shows : Array<IShow>): void {
 
 /** Handle search form submission: get shows from API and display.
  *    Hide episodes area (that only gets shown if they ask for episodes)
- */
+*/
 
 async function searchForShowAndDisplay() {
   const term = $("#searchForm-term").val();
@@ -57,7 +59,25 @@ $searchForm.on("submit", async function (evt) {
 });
 
 
-/** Write a clear docstring for this function... */
+/** Given a list of episodes create markup for each and adds to DOM in the
+ * episodesArea
+ * episodes is array like [{id, name, season, number}, ...]
+*/
 
-function populateEpisodes(episodes) {
+function populateEpisodes(episodes: Array<IEpisode>): void {
+  // $episodesArea.show(); TODO: Add this to conductor function?
+  $episodesArea.empty();
+
+  const $episodeList = $("<ul>");
+
+  for (const episode of episodes) {
+    const $episode = $(
+      `<li id=${episode.id}>
+        ${episode.name} (season ${episode.season}, number ${episode.number})
+      </li>`
+    );
+
+    $episodeList.append($episode);
+  }
+  $episodesArea.append($episodeList);
 }

@@ -40,7 +40,7 @@ async function searchShowsByTerm(term: string): Promise<Array<IShow>> {
  *      { id, name, season, number }
  */
 
-async function getEpisodesOfShow(id: number): Promise<Array<IEpisode>> | Promise<String> {
+async function getEpisodesOfShow(id: number): Promise<Array<IEpisode> | String> {
 
   const response = await fetch(`${TVMAZE_API_URL}shows/${id}/episodes`);
   const rawEpisodes = await response.json();
@@ -58,7 +58,7 @@ async function getEpisodesOfShow(id: number): Promise<Array<IEpisode>> | Promise
         }
       }
     )
-  } catch(err) {
+  } catch(err: any) {
     return err.message;
   }
 
