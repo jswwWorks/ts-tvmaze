@@ -1,10 +1,20 @@
 
 interface IShow {
-  id: number;
-  name: string;
-  summary: string;
-  image: string;
+  id: number,
+  name: string,
+  summary: string,
+  image: string
 }
 
 
-export default IShow;
+interface IEpisode {
+  id: number,
+  name: string,
+  season: string,
+  number: string
+}
+
+
+
+// look into this
+export { IShow, IEpisode };

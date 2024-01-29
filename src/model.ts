@@ -1,4 +1,4 @@
-import IShow from "./interfaces";
+import { IShow, IEpisode } from './interfaces.ts';
 
 const MISSING_IMAGE_URL = "https://tinyurl.com/missing-tv";
 const TVMAZE_API_URL = "https://api.tvmaze.com/";
@@ -40,8 +40,30 @@ async function searchShowsByTerm(term: string): Promise<Array<IShow>> {
  *      { id, name, season, number }
  */
 
-async function getEpisodesOfShow(id: number) {
-  console.log(id)
+async function getEpisodesOfShow(id: number): Promise<Array<IEpisode>> | Promise<String> {
+
+  const response = await fetch(`${TVMAZE_API_URL}shows/${id}/episodes`);
+  const rawEpisodes = await response.json();
+
+  let filteredEpisdoes;
+
+  try {
+    filteredEpisdoes = rawEpisodes.map(
+      (episode: any): IEpisode => {
+        return {
+          id: episode.id,
+          name: episode.name,
+          season: episode.season,
+          number: episode.number
+        }
+      }
+    )
+  } catch(err) {
+    return err.message;
+  }
+
+  return filteredEpisdoes;
+
 }
 
 
