@@ -11,7 +11,7 @@ const $searchForm = $("#searchForm");
  * shows is array like [{id, name, summary, image}, ...]
 */
 
-function populateShows(shows : Array<IShow>): void {
+function populateShows(shows: Array<IShow>): void {
   $showsList.empty();
 
   for (const show of shows) {
@@ -65,7 +65,6 @@ $searchForm.on("submit", async function (evt) {
 */
 
 function populateEpisodes(episodes: Array<IEpisode>): void {
-  // $episodesArea.show(); TODO: Add this to conductor function?
   $episodesArea.empty();
 
   const $episodeList = $("<ul>");
@@ -73,11 +72,33 @@ function populateEpisodes(episodes: Array<IEpisode>): void {
   for (const episode of episodes) {
     const $episode = $(
       `<li id=${episode.id}>
-        ${episode.name} (season ${episode.season}, number ${episode.number})
+      ${episode.name} (season ${episode.season}, number ${episode.number})
       </li>`
     );
 
     $episodeList.append($episode);
   }
+
   $episodesArea.append($episodeList);
+  $episodesArea.show(); // TODO: Add this to conductor function?
 }
+
+
+
+/**
+ *  Handles clicks on an episode button of a show. Calls getEpisodesOfShow
+ *  to get data about a show's episodes and calls populateEpisodes to put
+ *  that information into the DOM.
+ *
+ */
+
+
+
+// get all buttons from showslist
+// put an event listener on showsList and put target for event on a button
+$(".Show-getEpisodes").on("click", async function (evt) {
+  evt.preventDefault();
+  await getEpisodesOfShow();
+  await populateEpisodes();
+
+});
