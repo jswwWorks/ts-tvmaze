@@ -47,7 +47,7 @@ function populateShows(shows: Array<IShow>): void {
 
 async function searchForShowAndDisplay() {
   const term = $("#searchForm-term").val();
-  const shows = await searchShowsByTerm(term);
+  const shows = await searchShowsByTerm(term as string);
 
   $episodesArea.hide();
   populateShows(shows);
@@ -64,22 +64,27 @@ $searchForm.on("submit", async function (evt) {
  * episodes is array like [{id, name, season, number}, ...]
 */
 
-function populateEpisodes(episodes: Array<IEpisode>): void {
+function populateEpisodes(episodes: (Array<IEpisode> | String)): void {
   $episodesArea.empty();
 
-  const $episodeList = $("<ul>");
+  if(typeof episodes === "string") {
+    $episodesArea.append(episodes);
+  } else if(Array.isArray(episodes)) {
+    const $episodeList = $("<ul>");
 
-  for (const episode of episodes) {
-    const $episode = $(
-      `<li id=${episode.id}>
-      ${episode.name} (season ${episode.season}, number ${episode.number})
-      </li>`
-    );
+    for (const episode of episodes) {
+      const $episode = $(
+        `<li id=${episode.id}>
+        ${episode.name} (season ${episode.season}, number ${episode.number})
+        </li>`
+      );
 
-    $episodeList.append($episode);
+      $episodeList.append($episode);
+    }
+
+    $episodesArea.append($episodeList);
   }
 
-  $episodesArea.append($episodeList);
   $episodesArea.show(); // TODO: Add this to conductor function?
 }
 
@@ -98,7 +103,9 @@ function populateEpisodes(episodes: Array<IEpisode>): void {
 // put an event listener on showsList and put target for event on a button
 $(".Show-getEpisodes").on("click", async function (evt) {
   evt.preventDefault();
-  await getEpisodesOfShow();
-  await populateEpisodes();
 
+  const $showDiv = $(evt.target).closest("data-show-id")
+  const showId: number = $showDiv.data("showId");
+  const episodes = await getEpisodesOfShow(showId);
+  populateEpisodes(episodes); //TODO: What's going on here?
 });

@@ -1,4 +1,4 @@
-import { IShow, IEpisode } from './interfaces.ts';
+import { IShow, IEpisode, IShowAPI } from './interfaces.ts';
 
 const MISSING_IMAGE_URL = "https://tinyurl.com/missing-tv";
 const TVMAZE_API_URL = "https://api.tvmaze.com/";
@@ -11,7 +11,8 @@ const TVMAZE_API_URL = "https://api.tvmaze.com/";
  *    (if no image URL given by API, put in a default image URL)
  */
 
-async function searchShowsByTerm(term: string): Promise<Array<IShow>> {
+// async function searchShowsByTerm(term: string): Promise<Array<IShow>> { //TODO: Same as below syntatic sugar
+async function searchShowsByTerm(term: string): Promise<IShow[]> {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
 
   // Remove the hard coded array from the searchShowsByTerm function and replace
@@ -20,16 +21,16 @@ async function searchShowsByTerm(term: string): Promise<Array<IShow>> {
   //  described in the comments for the searchShowsByTerm function.
 
   const response = await fetch(`${TVMAZE_API_URL}search/shows?q=${term}`);
-  const rawShows = await response.json();
+  const rawShows: Array<IShowAPI> = await response.json();
   //TODO: How to best handle defining type of data that is large and variable
   //TODO: Can you use map on a variable that is a Promise?
-  const filteredShows = rawShows.map(
-    (show: any): IShow => {
+  const filteredShows = rawShows.map( //TODO: Be careful with naming of filteredShows and rawShows, this suggests getting rid of specific shows. Better name to describe diffs needed
+    (show): IShow => {
       return {
         id: show.show.id,
         name: show.show.name,
         summary: show.show.summary,
-        image: show.show.image.original || MISSING_IMAGE_URL
+        image: show.show.image.medium || MISSING_IMAGE_URL
       }
     }
   )
@@ -39,17 +40,19 @@ async function searchShowsByTerm(term: string): Promise<Array<IShow>> {
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
+//TODO: Throw the error! Don't handle here, let UI handle this. Don't have to
+//specify Type of throw, but specify in doc string.
 
 async function getEpisodesOfShow(id: number): Promise<Array<IEpisode> | String> {
 
   const response = await fetch(`${TVMAZE_API_URL}shows/${id}/episodes`);
-  const rawEpisodes = await response.json();
+  const rawEpisodes: Array<IEpisode> = await response.json();
 
   let filteredEpisdoes;
 
   try {
     filteredEpisdoes = rawEpisodes.map(
-      (episode: any): IEpisode => {
+      (episode): IEpisode => {
         return {
           id: episode.id,
           name: episode.name,
@@ -58,8 +61,8 @@ async function getEpisodesOfShow(id: number): Promise<Array<IEpisode> | String> 
         }
       }
     )
-  } catch(err: any) {
-    return err.message;
+  } catch(err: unknown) { //TODO: WHY any? Can also be unknown. This is nature of catch.
+    if (err instanceof Error) return err.message;
   }
 
   return filteredEpisdoes;

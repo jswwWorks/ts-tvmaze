@@ -6,6 +6,18 @@ interface IShow {
   image: string
 }
 
+interface IShowDataAPI { //TODO: IShow, this is the data
+  id: number,
+  name: string,
+  summary: string,
+  image: {medium: string}
+}
+
+interface IShowAPI { //TODO: IScoreAndShow, be more obvious in this
+  score: number,
+  show: IShowDataAPI
+}
+
 
 interface IEpisode {
   id: number,
@@ -26,4 +38,4 @@ interface IError {
 
 
 // look into this
-export { IShow, IEpisode, IError };
+export type { IShow, IEpisode, IError, IShowDataAPI, IShowAPI };
