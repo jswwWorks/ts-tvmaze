@@ -64,12 +64,16 @@ $searchForm.on("submit", async function (evt) {
  * episodes is array like [{id, name, season, number}, ...]
 */
 
-function populateEpisodes(episodes: (Array<IEpisode> | String)): void {
+function populateEpisodes(episodes: (IEpisode[] | String)): void {
   $episodesArea.empty();
 
   if(typeof episodes === "string") {
-    $episodesArea.append(episodes);
+
+    const $messageDisplay = (`<div><p>${episodes}</p></div>`);
+    $episodesArea.append($messageDisplay);
+
   } else if(Array.isArray(episodes)) {
+
     const $episodeList = $("<ul>");
 
     for (const episode of episodes) {
@@ -85,7 +89,7 @@ function populateEpisodes(episodes: (Array<IEpisode> | String)): void {
     $episodesArea.append($episodeList);
   }
 
-  $episodesArea.show(); // TODO: Add this to conductor function?
+  $episodesArea.show();
 }
 
 
@@ -100,12 +104,25 @@ function populateEpisodes(episodes: (Array<IEpisode> | String)): void {
 
 
 // get all buttons from showslist
+// FIXME: issue b/c this doesn't happen on a future reload
 // put an event listener on showsList and put target for event on a button
 $(".Show-getEpisodes").on("click", async function (evt) {
   evt.preventDefault();
 
   const $showDiv = $(evt.target).closest("data-show-id")
   const showId: number = $showDiv.data("showId");
-  const episodes = await getEpisodesOfShow(showId);
-  populateEpisodes(episodes); //TODO: What's going on here?
+
+  let episodes;
+
+  try {
+    episodes = await getEpisodesOfShow(showId);
+  } catch(error: unknown) {
+    if (error instanceof Error) {
+      episodes = error.message; // error.message should be "No episodes found."
+    }
+    // otherwise, there was still some sor of issue...
+    episodes = "Sorry, there was a problem with this request.";
+  }
+
+  populateEpisodes(episodes);
 });
